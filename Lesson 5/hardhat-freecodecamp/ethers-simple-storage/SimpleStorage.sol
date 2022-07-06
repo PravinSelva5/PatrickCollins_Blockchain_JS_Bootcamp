@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.8; // ^ sign can be used in front of the verison, ^0.8.7 to let the compiler know any version higher than the one specified can be used.
+pragma solidity 0.8.7; // ^ sign can be used in front of the verison, ^0.8.7 to let the compiler know any version higher than the one specified can be used.
 
 contract SimpleStorage {
     // Primitive Data Types: boolean, uint, int, address, bytes
