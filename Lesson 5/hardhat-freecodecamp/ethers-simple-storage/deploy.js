@@ -4,17 +4,13 @@
 
 const ethers = require("ethers");
 const fs = require("fs-extra");
+require("dotenv").config();
 
 async function main() {
   // http://127.0.0.1:7545
-  const provider = new ethers.providers.JsonRpcProvider(
-    "http://127.0.0.1:7545"
-  );
+  const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
   // the command below gives us access to wallet & its private keys so that transactions can be signed.
-  const wallet = new ethers.Wallet(
-    "6714da3bb500add5342a2761f0d49d03af76950e6af3921ee3393f41f14b6182",
-    provider
-  );
+  const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
   const abi = fs.readFileSync("./SimpleStorage_sol_SimpleStorage.abi", "utf8");
   const binary = fs.readFileSync(
     "./SimpleStorage_sol_SimpleStorage.bin",
@@ -39,7 +35,15 @@ async function main() {
   // console.log(transactionReceipt);
 
   const currentFavoriteNumber = await contract.retrieve();
-  console.log(currentFavoriteNumber);
+  // console.log(currentFavoriteNumber);
+  console.log(`Current Favourite Number:  ${currentFavoriteNumber.toString()}`);
+  const transactionResponse = await contract.store("7");
+  const transactionReceipt = await transactionResponse.wait(1);
+  const updatedFavouriteNumber = await contract.retrieve();
+
+  console.log(
+    `Updated Favourite Number is: ${updatedFavouriteNumber.toString()}`
+  );
 }
 
 main()
