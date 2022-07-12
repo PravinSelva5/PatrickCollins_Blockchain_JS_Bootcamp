@@ -10,7 +10,13 @@ async function main() {
   // http://127.0.0.1:7545
   const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
   // the command below gives us access to wallet & its private keys so that transactions can be signed.
-  const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+  //const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+  const encryptedJson = fs.readFileSync("./.encryptedKey.json", "utf8");
+  let wallet = new ethers.Wallet.fromEncryptedJsonSync(
+    encryptedJson,
+    process.env.PRIVATE_KEY_PASSWORD
+  );
+  wallet = await wallet.connect(provider);
   const abi = fs.readFileSync("./SimpleStorage_sol_SimpleStorage.abi", "utf8");
   const binary = fs.readFileSync(
     "./SimpleStorage_sol_SimpleStorage.bin",
