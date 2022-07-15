@@ -1,0 +1,14 @@
+yarn is equivalent to npm
+yarn is equivalent to npx
+
+
+
+-------------------------
+Environment Setup Issues
+-------------------------
+
+1. `npx hardhat --verbose` will help find the config that you need to delete when running npx hardhat or yarn hardhat
+
+2. The yarn equivalent of `npm install` is just `yarn`
+
+
