@@ -14,10 +14,21 @@
 
 // THE ABOVE CAN BE SHRINKED TO THE FOLLOWING SYNTAX AS WELL
 // An asynchronous nameless function
+
+// this syntax allows you to extrapolate the module/function that you want to use from a file.
+const { networkConfig } = require("../helper-hardhat-config")
+const { network } = require("hardhat")
+
 module.exports = async ({ getNamedAccounts, deployments }) => {
     const { deploy, log } = deployments
     const { deployer } = await getNamedAccounts()
     const chainId = network.config.chainId
+
+    // this allows us to extract data based off the chain that the user is on.
+    const ethUsdPriceFeedAddress = networkConfig[chainId]["ethUsdPriceFeed"]
+
+    // if the contract doesn't exist, we deploy a minimal version of
+    // for our local testing.
 
     // What is mocking?
     // This is primarily used for unit testing. An object under test may have dependencies
@@ -27,5 +38,9 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
     //  WHEN GOING FOR LOCALHOST OR HARDHAT NETWORK WE WANT TO USE A MOCK
 
-    const fundMe = await deploy("FundMe")
+    const fundMe = await deploy("FundMe", {
+        from: deployer,
+        args: [], // put price feed address
+        log: true,
+    })
 }
