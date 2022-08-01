@@ -16,16 +16,24 @@
 // An asynchronous nameless function
 
 // this syntax allows you to extrapolate the module/function that you want to use from a file.
-const { networkConfig } = require("../helper-hardhat-config")
+const { networkConfig, developmentChains } = require("../helper-hardhat-config")
 const { network } = require("hardhat")
+const { verify } = require("../utils/verify")
 
 module.exports = async ({ getNamedAccounts, deployments }) => {
-    const { deploy, log } = deployments
+    const { deploy, log, get } = deployments
     const { deployer } = await getNamedAccounts()
     const chainId = network.config.chainId
 
     // this allows us to extract data based off the chain that the user is on.
-    const ethUsdPriceFeedAddress = networkConfig[chainId]["ethUsdPriceFeed"]
+    //const ethUsdPriceFeedAddress = networkConfig[chainId]["ethUsdPriceFeed"]
+    let ethUsdPriceFeedAddress
+    if (developmentChains.includes(network.name)) {
+        const ethUsdAggregator = await get("MockV3Aggregator")
+        ethUsdPriceFeedAddress = ethUsdAggregator.address
+    } else {
+        const ethUsdPriceFeedAddress = networkConfig[chainId]["ethUsdPriceFeed"]
+    }
 
     // if the contract doesn't exist, we deploy a minimal version of
     // for our local testing.
@@ -37,10 +45,20 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     // real objects are impractical to incorporate into the unit test.
 
     //  WHEN GOING FOR LOCALHOST OR HARDHAT NETWORK WE WANT TO USE A MOCK
-
+    const args = [ethUsdPriceFeedAddress]
     const fundMe = await deploy("FundMe", {
         from: deployer,
-        args: [], // put price feed address
+        args: args, // put price feed address
         log: true,
     })
+    if (
+        !developmentChains.includes(network.name) &&
+        process.env.ETHERSCAN_API_KEY
+    ) {
+        // verify
+        await verify(fundMe.address, args)
+    }
+    log("----------------------------------------------------------------")
 }
+
+module.exports.tags = ["all", "fundme"]

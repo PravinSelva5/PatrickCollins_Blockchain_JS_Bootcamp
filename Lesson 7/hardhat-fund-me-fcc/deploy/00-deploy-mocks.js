@@ -8,9 +8,8 @@ const {
 module.exports = async ({ getNamedAccounts, deployments }) => {
     const { deploy, log } = deployments
     const { deployer } = await getNamedAccounts()
-    const chainId = network.config.chainId
 
-    if (developmentChains.includes(chainId)) {
+    if (developmentChains.includes(network.name)) {
         log("Local Network Detected! Deploying mocks...")
         await deploy("MockV3Aggregator", {
             contract: "MockV3Aggregator",
@@ -19,6 +18,9 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
             args: [DECIMALS, INITIAL_ANSWER],
         })
         log("Mocks deployed!")
-        log("--------------------------------------------------")
+        log("----------------------------------------------------------------")
     }
 }
+
+// this allows the developer to add flag '--tags <-tagName->' when executing yarn hardhat deploy to work locally
+module.exports.tags = ["all", "mocks"]
