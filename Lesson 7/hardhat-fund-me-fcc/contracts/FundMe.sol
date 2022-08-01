@@ -5,13 +5,16 @@ pragma solidity ^0.8.0;
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "./PriceConverter.sol";
 
-// 3. Interfaces, Libraries, Contracts
+// Error Codes
 error FundMe__NotOwner();
 
-/**@title A sample Funding Contract
- * @author Patrick Collins
+// 3. Interfaces, Libraries, Contracts
+
+// Natspec format for commenting solidity code
+/**@title A sample contract for crowd funding
+ * @author Pravin Selvarajah
  * @notice This contract is for creating a sample funding contract
- * @dev This implements price feeds as our library
+ * @dev This implements price feeds as our library [this is a note specifically for developers]
  */
 contract FundMe {
     // Type Declarations
