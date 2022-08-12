@@ -79,6 +79,7 @@ contract FundMe {
     }
 
     function cheaperWithdraw() public payable onlyOwner {
+        // reading the array to memory one time
         address[] memory funders = s_funders;
         // mappings can't be in memory, sorry!
         for (
