@@ -6,8 +6,13 @@ import { abi } from "./constants.js"
 
 const connectButton = document.getElementById("connectButton")
 const fundButton = document.getElementById("fundButton")
+const balanceButton = document.getElementById("balanceButton")
+const withdrawButton = document.getElementById("withdrawButton")
+
 connectButton.onclick = connect
 fundButton.onclick = fund
+balanceButton.onclick = getBalance
+withdrawButton.onclick = withdraw
 
 async function connect() {
     if (typeof window.ethereum !== "undefined") {
@@ -24,7 +29,16 @@ async function connect() {
     }
 }
 
-async function fund(ethAmount) {
+async function getBalance() {
+    if (typeof window.ethereum != "undefined") {
+        const provider = new ethers.providers.Web3Provider(window.ethereum)
+        const balance = await provider.getBalance(contractAddress)
+        console.log(ethers.utils.formatEther(balance))
+    }
+}
+
+async function fund() {
+    const ethAmount = document.getElementById("ethAmount")
     console.log(`Funding with ${ethAmount}...`)
     if (typeof window.ethereum !== "undefined") {
         // Three things we need to fund account:
@@ -50,17 +64,33 @@ async function fund(ethAmount) {
 
 function listenForTransactionMine(transactionResponse, provider) {
     console.log(`Mining ${transactionResponse.hash}...`)
-
-    provider.once(transactionResponse.hash, (transactionReceipt) => {
-        console.log(
-            `Completed with ${transactionReceipt.confirmations} confirmations`
-        )
+    // listen for this transaction to finish
+    return new Promise((resolve, reject) => {
+        provider.once(transactionResponse.hash, (transactionReceipt) => {
+            console.log(
+                `Completed with ${transactionReceipt.confirmations} confirmations`
+            )
+        })
     })
+
     // return new Promise
-    // the reason we're going to return a promise is we would like to have a listener monitoring the blockchain
-    // ethers comes with a way to listen to events
+    // the reason we're going to return a promise is we would like to have a listener,
+    // monitoring the blockchain.
+    // ethers.js comes with a way to listen to events.
 }
 
-// fund function
-
 // withdraw function
+async function withdraw() {
+    if (typeof window.ethereum != "undefined") {
+        console.log("Withdrawing ...")
+        const provider = new ethers.providers.Web3Provider(window.ethereum)
+        const signer = provider.getSigner()
+        const contract = new ethers.Contract(contractAddress, abi, signer)
+        try {
+            const transactionResponse = await contract.withdraw()
+            await listenForTransactionMine(transactionResponse, provider)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+}
